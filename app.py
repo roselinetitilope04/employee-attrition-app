@@ -36,7 +36,7 @@ YearsSinceLastPromotion = st.number_input("Years Since Last Promotion", 0, 15, 2
 YearsWithCurrManager = st.number_input("Years With Current Manager", 0, 20, 3)
 
 # Build dataframe
-input_data = pd.DataFrame([{
+new_data = pd.DataFrame([{
     "Age": Age,
     "BusinessTravel": BusinessTravel,
     "DailyRate": DailyRate,
@@ -64,22 +64,22 @@ input_data = pd.DataFrame([{
     "YearsWithCurrManager": YearsWithCurrManager
 }])
 # ---- FIX FEATURE NAME MISMATCH ----
-# Strip spaces from input columns
-input_data.columns = input_data.columns.str.strip()
+# Strip spaces from new columns
+new_data.columns = new_data.columns.str.strip()
 
 # Strip spaces from model feature names
 model_features = [col.strip() for col in model.feature_names_in_]
 
-# Add any missing columns to input_data (set them to 0)
+# Add any missing columns to new_data (set them to 0)
 for col in model_features:
-    if col not in input_data.columns:
-        input_data[col] = 0
+    if col not in new_data.columns:
+        new_data[col] = 0
 
 # Reorder columns to match model's expected order
-input_data = input_data[model_features]
+new_data = new_data[model_features]
 
-prediction = model.predict(input_data)[0]
-probability = model.predict_proba(input_data)[0][1]
+prediction = model.predict(new_data)[0]
+probability = model.predict_proba(new_data_data)[0][1]
 
 if prediction == 1:
     st.error(f"⚠️ Employee is likely to leave ({probability:.2%})")
