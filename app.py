@@ -63,28 +63,25 @@ input_data = pd.DataFrame([{
     "YearsSinceLastPromotion": YearsSinceLastPromotion,
     "YearsWithCurrManager": YearsWithCurrManager
 }])
-# ---------------- FIX FEATURE NAME MISMATCH ----------------
-
-# Clean input column names
+# ---- FIX FEATURE NAME MISMATCH ----
+# Strip spaces from input columns
 input_data.columns = input_data.columns.str.strip()
 
-# Clean model feature names
+# Strip spaces from model feature names
 model_features = [col.strip() for col in model.feature_names_in_]
 
-# Add missing columns (set to 0)
+# Add any missing columns to input_data (set them to 0)
 for col in model_features:
     if col not in input_data.columns:
         input_data[col] = 0
 
-# Reorder columns to match training
+# Reorder columns to match model's expected order
 input_data = input_data[model_features]
 
-# Predict
-if st.button("Predict Attrition"):
-    prediction = model.predict(input_data)
-    probability = model.predict_proba(input_data)
+prediction = model.predict(input_data)[0]
+probability = model.predict_proba(input_data)[0][1]
 
-    if prediction[0] == 1:
-        st.error(f"⚠️ High Attrition Risk ({probability[0][1]*100:.1f}%)")
-    else:
-        st.success(f"✅ Low Attrition Risk ({probability[0][1]*100:.1f}%)")
+if prediction == 1:
+    st.error(f"⚠️ Employee is likely to leave ({probability:.2%})")
+else:
+    st.success(f"✅ Employee likely to stay ({1 - probability:.2%})")
