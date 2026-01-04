@@ -64,19 +64,20 @@ new_data = pd.DataFrame([{
     "YearsWithCurrManager": YearsWithCurrManager
 }])
 # ---- FIX FEATURE NAME MISMATCH ----
-# Strip spaces from new columns
+# Clean input column names (remove extra spaces)
 new_data.columns = new_data.columns.str.strip()
 
-# Strip spaces from model feature names
+# Clean model feature names
 model_features = [col.strip() for col in model.feature_names_in_]
 
-# Add any missing columns to new_data (set them to 0)
+# Add missing columns (set to 0)
 for col in model_features:
     if col not in new_data.columns:
         new_data[col] = 0
 
 # Reorder columns to match model's expected order
 new_data = new_data[model_features]
+
 
 prediction = model.predict(new_data)[0]
 probability = model.predict_proba(new_data_data)[0][1]
