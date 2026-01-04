@@ -70,17 +70,17 @@ new_data.columns = new_data.columns.str.strip()
 # Clean model feature names
 model_features = [col.strip() for col in model.feature_names_in_]
 
-# Add missing columns (set to 0)
+# Add missing columns if any (fill with 0)
 for col in model_features:
-    if col not in new_data.columns:
+    if col not in input_data.columns:
         new_data[col] = 0
 
-# Reorder columns to match model's expected order
+# Reorder columns to match the training order
 new_data = new_data[model_features]
 
 
 prediction = model.predict(new_data)[0]
-probability = model.predict_proba(new_data_data)[0][1]
+probability = model.predict_proba(new_data)[0][1]
 
 if prediction == 1:
     st.error(f"⚠️ Employee is likely to leave ({probability:.2%})")
