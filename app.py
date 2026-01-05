@@ -72,7 +72,7 @@ model_features = [col.strip() for col in model.feature_names_in_]
 
 # Add missing columns if any (fill with 0)
 for col in model_features:
-    if col not in input_data.columns:
+    if col not in new_data.columns:
         new_data[col] = 0
 
 # Reorder columns to match the training order
