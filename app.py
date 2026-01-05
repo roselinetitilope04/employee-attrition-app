@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import time
 
 # ---- Load trained model ----
 model = joblib.load("attrition_pipeline.pkl")
@@ -48,7 +49,7 @@ if st.button("Predict"):
         "EducationField": EducationField,
         "EnvironmentSatisfaction": EnvironmentSatisfaction,
         "HourlyRate": HourlyRate,
-        "JobInvolvement": JobInvolvement,  # temporary column name
+        "JobInvolvement": JobInvolvement,
         "JobLevel": JobLevel,
         "JobRole": JobRole,
         "JobSatisfaction": JobSatisfaction,
@@ -75,7 +76,7 @@ if st.button("Predict"):
 
     for col in model.feature_names_in_:
         if col not in new_data.columns:
-            new_data[col] = 0  # fill missing features
+            new_data[col] = 0
 
     new_data = new_data[model.feature_names_in_]
 
@@ -83,8 +84,33 @@ if st.button("Predict"):
     prediction = model.predict(new_data)[0]
     probability = model.predict_proba(new_data)[0][1]
 
-    # ---- Display Result ----
+    # ---- Display Result with Animated Colored Progress Bar ----
+    st.write("### Prediction Result")
+    bar_placeholder = st.empty()  # placeholder for animation
+
     if prediction == 1:
-        st.error(f"⚠️ Employee is likely to leave ({probability:.2%})")
+        st.error("⚠️ Employee is likely to leave")
+        # Animate red progress bar
+        for i in range(int(probability*100)+1):
+            bar_placeholder.markdown(
+                f"""
+                <div style="background-color:#ddd; border-radius:5px; width:100%; height:25px;">
+                    <div style="width:{i}%; background-color:#FF4B4B; height:100%; border-radius:5px;"></div>
+                </div>
+                <p>Attrition Probability: {i:.0f}%</p>
+                """, unsafe_allow_html=True
+            )
+            time.sleep(0.01)
     else:
-        st.success(f"✅ Employee likely to stay ({1 - probability:.2%})")
+        st.success("✅ Employee likely to stay")
+        # Animate green progress bar
+        for i in range(int((1-probability)*100)+1):
+            bar_placeholder.markdown(
+                f"""
+                <div style="background-color:#ddd; border-radius:5px; width:100%; height:25px;">
+                    <div style="width:{i}%; background-color:#4CAF50; height:100%; border-radius:5px;"></div>
+                </div>
+                <p>Retention Probability: {i:.0f}%</p>
+                """, unsafe_allow_html=True
+            )
+            time.sleep(0.01)
