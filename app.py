@@ -63,22 +63,22 @@ new_data = pd.DataFrame([{
     "YearsSinceLastPromotion": YearsSinceLastPromotion,
     "YearsWithCurrManager": YearsWithCurrManager
 }])
-# ---- FIX FEATURE NAME MISMATCH ----
-# Clean input column names (remove extra spaces)
-new_data.columns = new_data.columns.str.strip()
+# ---- FIX FEATURE NAME MISMATCH (CORRECT WAY) ----
 
-# Clean model feature names
-model_features = [col.strip() for col in model.feature_names_in_]
+# Model expects these EXACT feature names (including spaces)
+model_features = list(model.feature_names_in_)
 
-# Add missing columns if any (fill with 0)
+# Build a dict matching model feature names
+aligned_data = {}
+
 for col in model_features:
-    if col not in new_data.columns:
-        new_data[col] = 0
+    clean_col = col.strip()  # match UI column
+    aligned_data[col] = new_data.get(clean_col, 0)
 
-# Reorder columns to match the training order
-new_data = new_data[model_features]
+# Create DataFrame EXACTLY as model expects
+new_data = pd.DataFrame([aligned_data])
 
-
+# Predict
 prediction = model.predict(new_data)[0]
 probability = model.predict_proba(new_data)[0][1]
 
