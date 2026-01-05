@@ -17,7 +17,7 @@ Education = st.selectbox("Education Level", [1, 2, 3, 4, 5])
 EducationField = st.selectbox("Education Field", [0, 1, 2, 3, 4, 5])
 EnvironmentSatisfaction = st.selectbox("Environment Satisfaction", [1, 2, 3, 4])
 HourlyRate = st.number_input("Hourly Rate", 30, 100, 50)
-JobInvolvement = st.selectbox("Job Involvement", [1, 2, 3, 4])
+JobInvolvement = st.selectbox(" Job Involvement ", [1, 2, 3, 4])
 JobLevel = st.selectbox("Job Level", [1, 2, 3, 4, 5])
 JobRole = st.selectbox("Job Role", [0, 1, 2, 3, 4, 5, 6, 7, 8])
 JobSatisfaction = st.selectbox("Job Satisfaction", [1, 2, 3, 4])
@@ -35,7 +35,7 @@ YearsInCurrentRole = st.number_input("Years in Current Role", 0, 20, 3)
 YearsSinceLastPromotion = st.number_input("Years Since Last Promotion", 0, 15, 2)
 YearsWithCurrManager = st.number_input("Years With Current Manager", 0, 20, 3)
 
-# Build dataframe
+# Keep the column names exactly as the model expects
 new_data = pd.DataFrame([{
     "Age": Age,
     "BusinessTravel": BusinessTravel,
@@ -45,7 +45,7 @@ new_data = pd.DataFrame([{
     "EducationField": EducationField,
     "EnvironmentSatisfaction": EnvironmentSatisfaction,
     "HourlyRate": HourlyRate,
-    "JobInvolvement": JobInvolvement,
+    " JobInvolvement ": JobInvolvement,  # <-- keep spaces
     "JobLevel": JobLevel,
     "JobRole": JobRole,
     "JobSatisfaction": JobSatisfaction,
@@ -63,20 +63,10 @@ new_data = pd.DataFrame([{
     "YearsSinceLastPromotion": YearsSinceLastPromotion,
     "YearsWithCurrManager": YearsWithCurrManager
 }])
-# ---- FIX FEATURE NAME MISMATCH (CORRECT WAY) ----
 
-# Model expects these EXACT feature names (including spaces)
-model_features = list(model.feature_names_in_)
-
-# Build a dict matching model feature names
-aligned_data = {}
-
-for col in model_features:
-    clean_col = col.strip()  # match UI column
-    aligned_data[col] = new_data.get(clean_col, 0)
-
-# Create DataFrame EXACTLY as model expects
-new_data = pd.DataFrame([aligned_data])
+# No stripping! Keep the original model feature names
+model_features = model.feature_names_in_
+new_data = new_data[model_features]
 
 # Predict
 prediction = model.predict(new_data)[0]
